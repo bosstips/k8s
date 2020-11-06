@@ -1,0 +1,9 @@
+- name: copy cluster config file
+  copy: 
+    src: ../files/kubeadm-config.yaml 
+    dest: /root/
+
+- name: init master-1
+  shell: cd /root/ && kubeadm init --config=kubeadm-config.yaml --upload-certs | tee kubeadm-init.log
+  async: 600
+  poll: 0

@@ -1,0 +1,10 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+
+10.211.55.160   master-1
+10.211.55.161   master-2
+10.211.55.162   master-3 
+10.211.55.163   node-1
+10.211.55.164   node-2
+10.211.55.170   master-vip

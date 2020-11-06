@@ -1,0 +1,20 @@
+- name: config yum 
+  shell: yum -y makecache && yum -y update
+
+- name: config yum 
+  shell: yum -y install conntrack ipvsadm ipset jq iptables curl sysstat libseccomp wget vim-enhanced lrzsz net-tools git net-tools psmisc bash-completion yum-utils.noarch nmap bind-utils
+
+- name: config timezone
+  shell: timedatectl set-timezone Asia/Shanghai
+
+- name: "将当前的 UTC 时间写入硬件时钟"
+  shell: timedatectl set-local-rtc 0
+
+- name: "重启依赖于系统时间的服务"
+  service: name=rsyslog state=restarted
+
+- name: "重启依赖于系统时间的服务"
+  service: name=crond state=restarted
+
+
+

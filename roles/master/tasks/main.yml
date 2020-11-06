@@ -1,0 +1,4 @@
+- import_tasks: 1.10_installHaproxy_Keepalived.yml
+- import_tasks: 1.11_install_kubeadm.yml
+#- import_tasks: 1.12_config_cluster.yml
+- import_tasks: 1.12_config_cluster.yml

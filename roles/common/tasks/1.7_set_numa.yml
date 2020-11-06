@@ -1,0 +1,12 @@
+- name: backup grub file
+  shell: cp /etc/default/grub{,.bak}
+
+- name: backup grub file
+  shell: cp /boot/grub2/grub.cfg{,.bak}
+
+- name: config grub file
+  shell: sed -i 's/quiet(.*)$/quiet numa=off"/g' /etc/default/grub
+
+- name: config grub file
+  command: /usr/sbin/grub2-mkconfig  -o /boot/grub2/grub.cfg
+  ignore_errors: yes

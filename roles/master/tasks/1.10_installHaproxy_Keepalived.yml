@@ -1,0 +1,18 @@
+- name: sync haproxy and nginx image
+  unarchive: src=../files/data.tar.gz dest=/
+
+- name: load haproxy image
+  shell: docker load -i /data/lb/haproxy-k8s.tar
+
+- name: load keepalived image
+  shell: docker load -i /data/lb/keepalived-k8s.tar
+
+- name: start haproxy and keepalived
+  shell: cd /data/lb && ./start-haproxy.sh && sleep 3 && ./start-keepalived.sh
+  ignore_errors: yes
+
+- name: install  kubeadm kubectl kubelet
+  yum: name=kubeadm-1.19.3,kubectl-1.19.3,kubelet-1.19.3   state=present
+
+- name: enable kubelet
+  service: name=kubelet  enabled=yes

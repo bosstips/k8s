@@ -1,0 +1,8 @@
+--- 
+  - hosts: all
+    tasks:
+    - name: copy haproxy config file
+      copy: src=../files/data/lb/etc/haproxy.cfg.after  dest=/data/lb/etc/haproxy.cfg mode=0777
+
+    - name: restart haproxy container
+      shell: docker rm -f HAProxy-K8S && bash /data/lb/start-haproxy.sh && sleep 3

@@ -1,0 +1,10 @@
+- import_tasks: 1.1_set_hostname.yml
+- import_tasks: 1.2_init_system.yml
+- import_tasks: 1.3_k8s_yum.yml
+#- include_tasks: 1.3_k8s_yum.yml    //include_tasks 会把任务放在后面运行
+- import_tasks: 1.4_preformence.yml
+- import_tasks: 1.5_k8s.kenel.yml
+- import_tasks: 1.6_journal.yml
+- import_tasks: 1.7_set_numa.yml
+- import_tasks: 1.8_set_ipvs.yml
+- import_tasks: 1.9_install_docker.yml

@@ -1,0 +1,5 @@
+[master]
+
+10.211.55.160   HOSTNAME=master-1   ansible_ssh_user=root
+10.211.55.161   HOSTNAME=master-2   ansible_ssh_user=root
+10.211.55.162   HOSTNAME=master-3  ansible_ssh_user=root

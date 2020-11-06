@@ -1,0 +1,23 @@
+- name: config yum  CentOS-Base.repo
+  get_url:
+    url: http://mirrors.aliyun.com/repo/Centos-8.repo
+    dest: /etc/yum.repos.d/CentOS-Base.repo
+    mode: '0644'
+
+- name: config yum epel.repo
+  shell: yum install -y https://mirrors.aliyun.com/epel/epel-release-latest-8.noarch.rpm
+
+- name: config yum epel.repo
+  shell: sed -i 's|^#baseurl=https://download.fedoraproject.org/pub|baseurl=https://mirrors.ali yun.com|' /etc/yum.repos.d/epel*
+
+- name: config yum epel.repo
+  shell: sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
+
+- name: install yum-utils
+  yum: name=yum-utils  state=present
+
+- name: config yum docker-ce
+  shell: yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+- name: config yum kubernetes
+  copy: src=../files/kubernetes.repo dest=/etc/yum.repos.d/kubernetes.repo

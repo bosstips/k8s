@@ -1,0 +1,2 @@
+10.211.55.163   HOSTNAME=node-1  ansible_ssh_user=root
+10.211.55.164   HOSTNAME=node-2  ansible_ssh_user=root

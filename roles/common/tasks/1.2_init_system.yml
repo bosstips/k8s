@@ -1,0 +1,12 @@
+- name: set swap off
+  shell: swapoff -a && sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+- name: set selinux off
+  shell: setenforce 0 && sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+  ignore_errors: yes
+
+- name: set firewalld off
+  shell: systemctl stop firewalld && systemctl disable firewalld
+
+- name: intall iptables and init
+  shell: yum -y install iptables-services && systemctl start iptables && systemctl enable iptables && iptables -F && service iptables save

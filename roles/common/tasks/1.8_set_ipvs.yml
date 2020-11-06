@@ -1,0 +1,11 @@
+- name: modprobe
+  shell: modprobe br_netfilter
+
+- name: add ipvsmod config
+  copy: src=../files/ipvs.modules dest=/etc/sysconfig/modules/ipvs.modules mode=755
+
+- name:  "生效ipvs配置"
+  shell: bash /etc/sysconfig/modules/ipvs.modules
+
+- name: "确认安装ipvs模块"
+  shell: lsmod | grep -e ip_vs -e nf_conntrack_ipv4
