@@ -1,0 +1,10 @@
+---
+  - hosts: all
+    tasks:
+    - name: ehco test
+      shell: echo haha
+      when: ansible_facts.enp0s5.ipv4.address == '10.211.55.160'
+    - name: "打印IP"
+      shell: printf {{ ansible_facts["enp0s5"]["ipv4"]["address"] }}
+#      shell: echo {{ ansible_facts['os_family'] }} 
+#      when: ansible_facts['os_family'] == "Debian"
