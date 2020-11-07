@@ -2,8 +2,10 @@
   copy: 
     src: ../files/kubeadm-config.yaml 
     dest: /root/
+  when: ansible_facts.enp0s5.ipv4.address == '10.211.55.160'
 
 - name: init master-1
   shell: cd /root/ && kubeadm init --config=kubeadm-config.yaml --upload-certs | tee kubeadm-init.log
+  when: ansible_facts.enp0s5.ipv4.address == '10.211.55.160'
   async: 600
   poll: 0
