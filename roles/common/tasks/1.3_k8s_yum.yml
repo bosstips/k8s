@@ -8,7 +8,7 @@
   shell: yum install -y https://mirrors.aliyun.com/epel/epel-release-latest-8.noarch.rpm
 
 - name: config yum epel.repo
-  shell: sed -i 's|^#baseurl=https://download.fedoraproject.org/pub|baseurl=https://mirrors.ali yun.com|' /etc/yum.repos.d/epel*
+  shell: sed -i 's|^#baseurl=https://download.fedoraproject.org/pub|baseurl=https://mirrors.aliyun.com|' /etc/yum.repos.d/epel*
 
 - name: config yum epel.repo
   shell: sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
@@ -21,3 +21,30 @@
 
 - name: config yum kubernetes
   copy: src=../files/kubernetes.repo dest=/etc/yum.repos.d/kubernetes.repo
+
+
+- name: intall iptables and init
+  dnf:  name=iptables-services state=present
+
+- name: Iptables flush filter
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: Iptables flush nat
+  iptables:
+    table: nat
+    chain: '{{ item }}'
+    flush: yes
+  with_items: [ 'INPUT', 'OUTPUT', 'PREROUTING', 'POSTROUTING' ]
+
+- name: Allow new incoming SYN packets on TCP port 22 (SSH)
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: 22
+    ctstate: NEW
+    syn: match
+    jump: ACCEPT
+    comment: Accept new SSH connections.

@@ -8,5 +8,13 @@
 - name: set firewalld off
   shell: systemctl stop firewalld && systemctl disable firewalld
 
-- name: intall iptables and init
-  shell: yum -y install iptables-services && systemctl start iptables && systemctl enable iptables && iptables -F && service iptables save
+- name: set timezone to  Asia/Shanghai
+  timezone:
+    name: Asia/Shanghai
+
+- name: set time now
+  shell: sed -i 's/2.centos.pool.ntp.org/ntp1.aliyun.com/g' /etc/chrony.conf
+  ignore_errors: yes
+
+- name: sync time now
+  service: name=chronyd  state=restarted

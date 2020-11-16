@@ -1,4 +1,4 @@
-- name: install docker
+- name: install device-mapper-persistent-data lvm2
   yum: name=yum-utils,device-mapper-persistent-data,lvm2
 
 - name: install containerd.io
@@ -16,5 +16,9 @@
 - name: mkdir -p /etc/systemd/system/docker.service.d
   file: path=/etc/systemd/system/docker.service.d  state=directory
 
+- name: just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
 - name: start docker
-  shell: systemctl daemon-reload && systemctl restart docker && systemctl enable docker
+  systemd:  name=docker  state=started  enabled=yes
