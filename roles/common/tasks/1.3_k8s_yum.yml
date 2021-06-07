@@ -1,17 +1,33 @@
 - name: config yum  CentOS-Base.repo
   get_url:
-    url: http://mirrors.aliyun.com/repo/Centos-8.repo
+    url: https://mirrors.aliyun.com/repo/Centos-8.repo
     dest: /etc/yum.repos.d/CentOS-Base.repo
     mode: '0644'
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8"
+
+- name: config yum  CentOS-Base.repo
+  get_url:
+    url: https://mirrors.aliyun.com/repo/Centos-7.repo
+    dest: /etc/yum.repos.d/CentOS-Base.repo
+    mode: '0644'
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7"
 
 - name: config yum epel.repo
   shell: yum install -y https://mirrors.aliyun.com/epel/epel-release-latest-8.noarch.rpm
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8"
 
 - name: config yum epel.repo
   shell: sed -i 's|^#baseurl=https://download.fedoraproject.org/pub|baseurl=https://mirrors.aliyun.com|' /etc/yum.repos.d/epel*
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8"
 
 - name: config yum epel.repo
   shell: sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8")
+
+- name: config yum epel.repo
+  shell: yum install -y https://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7"
+  ignore_errors: yes
 
 - name: install yum-utils
   yum: name=yum-utils  state=present
@@ -25,6 +41,11 @@
 
 - name: intall iptables and init
   dnf:  name=iptables-services state=present
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8"
+
+- name: intall iptables and init
+  yum:  name=iptables-services state=present
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7"
 
 - name: Iptables flush filter
   iptables:

@@ -2,9 +2,9 @@
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
 
-172.16.201.60   master1
-172.16.201.61   master2
-172.16.201.62   master3
-172.16.201.70   node1
-172.16.201.71   node2
-172.16.201.10   master-vip
+10.211.55.160   master-1
+10.211.55.161   master-2
+10.211.55.162   master-3 
+10.211.55.163   node-1
+10.211.55.164   node-2
+10.211.55.170   master-vip

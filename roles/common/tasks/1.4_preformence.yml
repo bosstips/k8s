@@ -4,8 +4,9 @@
 - name: config yum 
   shell: yum -y install conntrack ipvsadm ipset jq iptables curl sysstat libseccomp wget vim-enhanced lrzsz net-tools git net-tools psmisc bash-completion yum-utils.noarch nmap bind-utils
 
-- name: config timezone
-  shell: timedatectl set-timezone Asia/Shanghai
+- name: Set timezone to Asia/Shanghai
+  community.general.timezone:
+    name: Asia/Shanghai
 
 - name: "将当前的 UTC 时间写入硬件时钟"
   shell: timedatectl set-local-rtc 0

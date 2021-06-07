@@ -12,7 +12,7 @@
   ignore_errors: yes
 
 - name: install  kubeadm kubectl kubelet
-  yum: name=kubeadm-1.19.3,kubectl-1.19.3,kubelet-1.19.3   state=present
+  yum: name=kubeadm-'{{ version }}',kubectl-'{{ version }}',kubelet-'{{ version }}'   state=present
 
 - name: enable kubelet
   service: name=kubelet  enabled=yes

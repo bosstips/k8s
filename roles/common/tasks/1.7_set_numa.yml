@@ -1,12 +1,16 @@
 - name: backup grub file
   shell: cp /etc/default/grub{,.bak}
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8"
 
 - name: backup grub file
   shell: cp /boot/grub2/grub.cfg{,.bak}
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8"
 
 - name: config grub file
   shell: sed -i 's/quiet(.*)$/quiet numa=off"/g' /etc/default/grub
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8"
 
 - name: config grub file
   command: /usr/sbin/grub2-mkconfig  -o /boot/grub2/grub.cfg
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8"
   ignore_errors: yes
