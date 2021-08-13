@@ -1,4 +1,30 @@
 - ansible.posix.sysctl:
+    name: net.ipv6.conf.all.disable_ipv6
+    value: '1'
+    sysctl_set: yes
+    sysctl_file: /etc/sysctl.d/kubernetes.conf
+    state: present
+    reload: yes
+    ignoreerrors: yes
+- ansible.posix.sysctl:
+    name: net.ipv6.conf.default.disable_ipv6
+    value: '1'
+    sysctl_set: yes
+    sysctl_file: /etc/sysctl.d/kubernetes.conf
+    state: present
+    reload: yes
+    ignoreerrors: yes
+- ansible.posix.sysctl:
+    name: net.ipv6.conf.lo.disable_ipv6
+    value: '1'
+    sysctl_set: yes
+    sysctl_file: /etc/sysctl.d/kubernetes.conf
+    state: present
+    reload: yes
+    ignoreerrors: yes
+
+
+- ansible.posix.sysctl:
     name: net.bridge.bridge-nf-call-iptables
     value: '1'
     sysctl_set: yes
