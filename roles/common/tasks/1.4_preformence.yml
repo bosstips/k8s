@@ -2,7 +2,8 @@
   shell: yum -y makecache && yum -y update
 
 - name: config yum 
-  shell: yum -y install conntrack ipvsadm ipset jq iptables curl sysstat libseccomp wget vim-enhanced lrzsz net-tools git net-tools psmisc bash-completion yum-utils.noarch nmap bind-utils
+  shell: yum -y install conntrack ipvsadm ipset jq iptables curl sysstat libseccomp wget vim-enhanced lrzsz net-tools git net-tools psmisc bash-completion yum-utils.noarch nmap bind-utils  ebtables socat  conntrack
+
 
 - name: Set timezone to Asia/Shanghai
   community.general.timezone:
