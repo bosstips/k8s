@@ -1,11 +1,10 @@
 [add]
 
-#172.16.201.60  HOSTNAME=master1
-#172.16.201.61  HOSTNAME=master2
-#172.16.201.62  HOSTNAME=master3
-#172.16.201.70  HOSTNAME=node1
-#172.16.201.71  HOSTNAME=node2
-172.16.201.71    HOSTNAME=devlop
+172.16.30.71  HOSTNAME=master-1
+172.16.30.72  HOSTNAME=master-2
+172.16.30.73  HOSTNAME=master-3
+#172.16.30.81  HOSTNAME=node-1
+#172.16.30.82  HOSTNAME=node-2
 
 [all:vars]
 ansible_ssh_user=root

@@ -2,7 +2,7 @@
   yum: name=yum-utils,device-mapper-persistent-data,lvm2
 
 - name: install docker-ce
-  yum: name=docker-ce-19.03.9-3.el7,docker-ce-19.03.9-3.el7,containerd.io
+  yum: name=docker-ce-19.03.15-3.el7,docker-ce-19.03.15-3.el7,containerd.io
 
 - name: create /etc/docker dir
   file: path=/etc/docker  state=directory
