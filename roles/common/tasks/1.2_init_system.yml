@@ -12,6 +12,9 @@
   timezone:
     name: Asia/Shanghai
 
+- name: present chronyd service
+  yum: name=chronyd state=present
+
 - name: set time now
   shell: sed -i 's/2.centos.pool.ntp.org/ntp1.aliyun.com/g' /etc/chrony.conf
   ignore_errors: yes
