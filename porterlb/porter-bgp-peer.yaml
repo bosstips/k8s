@@ -1,0 +1,25 @@
+apiVersion: network.kubesphere.io/v1alpha2
+kind: BgpPeer
+metadata:
+  name: porter-bgp-peer
+spec:
+  conf:
+    peerAs: 50001
+    neighborAddress: 172.16.30.19
+
+  afiSafis:
+    - config:
+        family:
+          afi: AFI_IP
+          safi: SAFI_UNICAST
+        enabled: true
+      addPaths:
+        config:
+          sendMax: 10
+  nodeSelector:
+    matchLabels:
+      porter.kubesphere.io/rack: leaf1
+    matchLabels:
+      porter.kubesphere.io/rack: leaf2
+    matchLabels:
+      porter.kubesphere.io/rack: leaf3

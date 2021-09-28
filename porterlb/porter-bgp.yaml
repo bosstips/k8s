@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: porter-bgp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: porter-bgp
+  template:
+    metadata:
+      labels:
+        app: porter-bgp
+    spec:
+      containers:
+        - image: luksa/kubia
+          name: kubia
+          ports:
+            - containerPort: 8080

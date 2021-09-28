@@ -1,0 +1,94 @@
+- name: KubeSphere | Checking ha-redis
+  shell: >
+    {{ bin_dir }}/helm list -n kubesphere-system | grep "ks-redis"
+  register: redis_check
+  failed_when: false
+
+
+- name: KubeSphere | Deploying ha redis
+  block:
+
+    - name: KubeSphere | Getting redis installation files
+      copy:
+        src: "{{ item }}"
+        dest: "{{ kubesphere_dir }}/"
+      loop:
+        - "redis-ha"
+
+
+    - name: KubeSphere | Creating manifests
+      template:
+        src: "{{ item.file }}.j2"
+        dest: "{{ kubesphere_dir }}/{{ item.file }}"
+      with_items:
+        - { name: custom-values-redis, file: custom-values-redis.yaml }
+
+
+    - name: KubeSphere | Checking old redis status
+      shell: >
+        {{ bin_dir }}/kubectl get pod -n kubesphere-system  -l app=redis,tier=database,version=redis-4.0 | wc -l
+      register: old_redis_exist
+
+
+    - name: KubeSphere | Deleting and backup old redis svc
+      shell: >
+        {{ bin_dir }}/kubectl get svc -n kubesphere-system redis -o yaml > {{ kubesphere_dir }}/redis-svc-backup.yaml
+        &&
+        {{ bin_dir }}/kubectl delete svc -n kubesphere-system redis
+      when:
+        - old_redis_exist.stdout != "0"
+
+
+    - name: KubeSphere | Deploying redis
+      shell: >
+        {{ bin_dir }}/helm upgrade --install ks-redis
+        {{ kubesphere_dir }}/redis-ha
+        -f {{ kubesphere_dir }}/custom-values-redis.yaml
+        --set fullnameOverride=redis-ha
+        --namespace kubesphere-system
+
+
+    - name: KubeSphere | Getting redis PodIp
+      shell: >
+        {{ bin_dir }}/kubectl get pod
+        -n kubesphere-system
+        -l  app=redis,tier=database,version=redis-4.0
+        -ojsonpath='{.items[0].status.podIP}'
+      register: redis_podIp
+      when:
+        - old_redis_exist.stdout != "0"
+
+
+    - import_tasks: redis-migration.yaml
+      when:
+        - old_redis_exist.stdout != "0"
+
+  when:
+    - enableHA is defined and enableHA
+    - (redis_check.stdout.find("deployed") == -1) or (redis_check.stdout.find("5.0.5") == -1)
+
+
+- name: KubeSphere | Deploying redis
+  shell: >
+    {{ bin_dir }}/kubectl -n kubesphere-system apply -f {{ kubesphere_dir }}/common/{{ item }}
+  loop:
+    - "redis.yaml"
+  register: import
+  failed_when:
+    - "import.stderr and 'bound claims' not in import.stderr"
+    - "import.stderr and 'is forbidden' not in import.stderr"
+  when:
+    - (enableHA is defined and not enableHA) or (enableHA is not defined)
+
+
+- name: KubeSphere | Importing redis status
+  shell: >
+    {{ bin_dir }}/kubectl patch cc ks-installer
+    --type merge
+    -p '{"status": {"redis": {"status": "enabled", "enabledTime": "{{ lookup('pipe','date  +%Y-%m-%dT%H:%M:%S%Z') }}"}}}'
+    -n kubesphere-system
+  register: import
+  failed_when: "import.stderr and 'Warning' not in import.stderr"
+  until: import is succeeded
+  retries: 5
+  delay: 3

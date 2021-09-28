@@ -1,0 +1,51 @@
+# value of kube-auditing operator
+operator:
+  image:
+    repository: {{ auditing_operator_repo }}
+    tag: {{ auditing_operator_tag }}
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 200m
+      memory: 200Mi
+    requests:
+      cpu: 20m
+      memory: 20Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+
+# value of kube-auditing webhook
+webhook:
+  image:
+    repository: {{ auditing_webhook_repo }}
+    tag: {{ auditing_webhook_tag }}
+    pullPolicy: IfNotPresent
+  replicas: 2
+  args: []
+  imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 20m
+      memory: 50Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  receivers:
+    - name: alert
+      type: alertmanager
+      config:
+        service:
+          namespace: kubesphere-monitoring-system
+          name: alertmanager-main
+          port: 9093
+  archivingPriority: DEBUG
+  alertingPriority: WARNING
+  auditType: dynamic
+  auditLevel: Metadata
+  k8sAuditingEnabled: false

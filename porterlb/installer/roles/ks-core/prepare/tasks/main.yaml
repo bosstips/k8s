@@ -1,0 +1,128 @@
+---
+- name: KubeSphere | Checking core components (1)
+  shell: >
+    {{ bin_dir }}/kubectl get deploy -n kubesphere-system ks-account
+  register: check_account
+  failed_when: "check_account.stderr and 'NotFound' not in check_account.stderr"
+
+- name: KubeSphere | Checking core components (2)
+  shell: >
+    {{ bin_dir }}/kubectl get deploy -n kubesphere-system ks-apigateway
+  register: check_apigateway
+  failed_when: "check_apigateway.stderr and 'NotFound' not in check_apigateway.stderr"
+
+- name: KubeSphere | Checking core components (3)
+  shell: >
+    {{ bin_dir }}/kubectl get deploy -n kubesphere-system ks-account -o jsonpath='{.spec.replicas}'
+  register: check_account_replicas
+  failed_when: "check_account_replicas.stderr and 'NotFound' not in check_account_replicas.stderr"
+  when:
+    - check_account.rc == 0
+
+- name: KubeSphere | Checking core components (4)
+  shell: >
+    {{ bin_dir }}/kubectl get deploy -n kubesphere-system ks-apigateway -o jsonpath='{.spec.replicas}'
+  register: check_apigateway_replicas
+  failed_when: "check_apigateway_replicas.stderr and 'NotFound' not in check_apigateway_replicas.stderr"
+  when:
+    - check_apigateway.rc == 0
+
+- block:
+  - name: KubeSphere | Updating ks-core status
+    shell: >
+      {{ bin_dir }}/kubectl patch cc ks-installer
+      --type merge
+      -p '{"status": {"core": {"migration": true}}}'
+      -n kubesphere-system
+    register: import
+    failed_when: "import.stderr and 'Warning' not in import.stderr"
+    until: import is succeeded
+    retries: 5
+    delay: 3
+  - set_fact:
+      ks_upgrade: True
+  when:
+    - check_account.rc == 0
+    - check_apigateway.rc == 0
+    - check_account_replicas.stdout != "0"
+    - check_apigateway_replicas.stdout != "0"
+    - "'NotFound' not in check_account.stderr"
+    - "'NotFound' not in check_apigateway.stderr"
+    - "'NotFound' not in check_account_replicas.stderr"
+    - "'NotFound' not in check_apigateway_replicas.stderr"
+
+
+- name: KubeSphere | Creating KubeSphere directory
+  file:
+    path: "{{ kubesphere_dir }}"
+    state: directory
+    mode: 0755
+
+
+- name: KubeSphere | Getting installation init files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ kubesphere_dir }}/"
+  loop:
+    - "ks-init"
+
+- import_tasks: ks-init.yaml
+  when: ks_upgrade is not defined or (ks_upgrade != True)
+
+
+- name: KubeSphere | Initing KubeSphere
+  shell: "{{ bin_dir }}/kubectl apply -f {{ kubesphere_dir }}/ks-init/{{ item }}"
+  loop:
+    - "role-templates.yaml"
+    - "webhook-secret.yaml"
+    - "network.kubesphere.io.yaml"
+    - "iam.kubesphere.io.yaml"
+    - "quota.kubesphere.io.yaml"
+  register: import
+  failed_when: "import.stderr and 'AlreadyExists' not in import.stderr and 'Warning' not in import.stderr"
+
+
+- name: KubeSphere | Getting controls-system file
+  template:
+    src: "{{ item.file }}.j2"
+    dest: "{{ kubesphere_dir }}/{{ item.file }}"
+  with_items:
+    - { name: kubesphere-controls-system, file: kubesphere-controls-system.yaml }
+
+
+- name: KubeSphere | Installing controls-system
+  command: "{{ bin_dir }}/kubectl apply -f {{ kubesphere_dir }}/kubesphere-controls-system.yaml  -n kubesphere-controls-system"
+  register: import
+  failed_when: "import.stderr and 'AlreadyExists' not in import.stderr"
+
+
+# - name: KubeSphere | Creating KubeSphere vpa
+#   shell: "{{ bin_dir }}/kubectl apply -f {{ kubesphere_dir }}/ks-init/ks-vpa.yaml"
+#   register: result
+#   until: result is succeeded
+#   retries: 5
+#   delay: 3
+#   when:
+#     - vertical_pod_autoscaler_enable == true
+
+- name: KubeSphere | Generating kubeconfig-admin
+  shell: >
+    /bin/bash {{ kubesphere_dir }}/ks-init/generate-kubeconfig.sh
+  when:
+    - openpitrix.enabled is defined and openpitrix.enabled
+
+# - name: KubeSphere | Checking kubesphere component
+#   shell: >
+#     {{ bin_dir }}/kubectl get deploy -n kubesphere-system
+#   register: kubesphere_component_pod
+
+# - name: KubeSphere | Getting kubesphere component version
+#   shell: >
+#     {{ bin_dir }}/kubectl get deploy -n  kubesphere-system ks-console -o jsonpath='{.metadata.labels.version}'
+#   register: console_version
+#   when:
+#     - kubesphere_component_pod.stdout.find("ks-console") != -1
+
+# - import_tasks: ks-stop.yaml
+#   when:
+#     - console_version.stdout and console_version.stdout != ks_version

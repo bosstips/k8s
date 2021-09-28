@@ -1,0 +1,28 @@
+kubectl label --overwrite nodes master1 master2 master3 lb.kubesphere.io/v1alpha1=porter
+
+
+kubectl scale deployment porter-manager --replicas=0 -n porter-system
+
+
+
+kubectl edit deployment porter-manager -n porter-system
+
+
+
+
+nodeSelector:
+  kubernetes.io/os: linux
+  lb.kubesphere.io/v1alpha1: porter
+
+
+
+
+
+  kubectl scale deployment porter-manager --replicas=3 -n porter-system
+
+
+
+
+  kubectl label --overwrite nodes master1 porter.kubesphere.io/rack=leaf1
+  kubectl label --overwrite nodes master2 porter.kubesphere.io/rack=leaf2
+  kubectl label --overwrite nodes master3 porter.kubesphere.io/rack=leaf3
